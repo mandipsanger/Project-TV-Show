@@ -9,13 +9,33 @@
   </head>
 
   <body>
-    <div id="root">
-    </div>
+    <template id="episode_cards_template">
+      <section id="episode_details">
+        <!-- name of the episode -->
+        <h2 id="name">Name of Episode</h2>
+        <h3 id="EpisodeNumber" >number of episode</h3>
+        <img id="image">Episode image</img>
+        <p id="summary">The summary page of the episode</p>
 
+      </section>
+
+    </template>
+    <div id="root">
+      
+
+    
+      
+    </div>
+    <footer>
+      <p>The data come from: <a href="https://tvmaze.com/">TVMaze.com</a> </p>
+    
+    </footer>
     <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
+
     <script src="episodes.js"></script>
 
     <!-- Loads YOUR javascript code -->
     <script src="script.js"></script>
+    
   </body>
 </html>
