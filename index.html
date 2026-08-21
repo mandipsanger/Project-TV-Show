@@ -9,66 +9,34 @@
   </head>
 
   <body>
-    <header class="container">
-      <h1>TV Show Project</h1>
-      <h2>Sample Solution</h2>
-      <form>
-        <label for="show-select" class="is-invisible">Select A Show</label>
-        <select id="show-select" name="show-select"></select>
-        <label for="episode-select" class="is-invisible"
-          >Select One Episode</label
-        >
-        <select id="episode-select" name="episode-select"></select>
-        <button id="reset-state" type="reset">Reset</button>
-        <template id="option-template">
-          <option>Select an option</option>
-        </template>
-      </form>
-    </header>
-    <main class="container">
-      <div id="card-container" class="grid">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50">
-          <style>
-            @keyframes dash {
-              to {
-                stroke-dashoffset: 20;
-              }
-            }
-          </style>
-          <circle
-            cx="25"
-            cy="25"
-            r="10"
-            fill="none"
-            stroke="white"
-            stroke-width="2"
-            stroke-dasharray="4"
-            style="animation: dash 3s infinite"
-          />
-          <text x="0" y="25" color="#fff">Loading</text>
-        </svg>
-      </div>
-      <template id="card-template">
-        <section data-episode class="card">
-          <h3 class="card__title" data-episode="title">Name Goes Here</h3>
-          <div class="card__summary" data-episode="summary">
-            Summary Goes Here
-          </div>
-          <img
-            class="card__image"
-            data-episode="image"
-            src=""
-            alt=""
-            height="140"
-            width="250"
-          />
-        </section>
-      </template>
-    </main>
-    <footer class="container">
-      <h2>Data originally from <a href="https://tvmaze.com/">TV Maze</a></h2>
+    <template id="episode_cards_template">
+      <section id="episode_details">
+        <!-- name of the episode -->
+        <h2 id="name">Name of Episode</h2>
+        <h3 id="EpisodeNumber" >number of episode</h3>
+        <img id="image">Episode image</img>
+        <p id="summary">The summary page of the episode</p>
+
+      </section>
+
+    </template>
+    <input id="search" type="text" placeholder="Search episodes...">
+    <div id="root">
+      
+
+    
+      
+    </div>
+    <footer>
+      <p>The data come from: <a href="https://tvmaze.com/">TVMaze.com</a> </p>
+    
     </footer>
+    <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
+
+    <script src="episodes.js"></script>
+
     <!-- Loads YOUR javascript code -->
-    <script src="lib/app.mjs" type="module"></script>
+    <script src="script.js"></script>
+    
   </body>
 </html>
