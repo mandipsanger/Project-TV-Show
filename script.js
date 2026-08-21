@@ -1,70 +1,75 @@
-// You can edit ALL of the code here
 
-function setup() {
-  const allEpisodes = getAllEpisodes();
-  makePageForEpisodes(allEpisodes);
+const root = document.getElementById("root");
+const state = {
+  allEpisodes: getAllEpisodes(),
+  searchTerm: "",
+};
+function render() {
+  const filteredFilms = state.allEpisodes.filter((film) =>
+    film.title.includes(state.searchTerm),
+  );
+  const filmCards = filteredFilms.map(createFilmCard);
+  document.body.append(...filmCards);
 }
 
-function makePageForEpisodes(episodeList) {
-  const rootElem = document.getElementById("root");
+function createEpisodeCard(ep) {
+  const seasonNumber = String(ep.season).padStart(2, "0");
+  const episodeNumber = String(ep.number).padStart(2, "0");
 
-  // Clear previous content
-  rootElem.innerHTML = "";
+  return `
+    <div class="card">
+      <h1 class="title">
+        S${seasonNumber}E${episodeNumber} - ${ep.name}
+      </h1>
 
-  // 1. Show total number of episodes
-  const header = document.createElement("h2");
-  header.textContent = `Got ${episodeList.length} episode(s)`;
-  rootElem.appendChild(header);
+      ${
+        ep.image?.medium
+          ? `
+            <img
+              src="${ep.image.medium}"
+              alt="${ep.name} episode poster"
+            />
+          `
+          : ""
+      }
 
-  // 2. Loop through each episode
-  episodeList.forEach(function (episode) {
-    const container = document.createElement("div");
+      <div class="content">
+        ${ep.summary || "<p>No summary available.</p>"}
+      </div>
+    </div>
+  `;
+}
+function render() {
+  const filteredEpisodes = state.allEpisodes.filter(
+    (episode) =>
+      episode.name.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
+      episode.summary.toLowerCase().includes(state.searchTerm.toLowerCase()),
+  );
+  const searchCount = document.getElementById("search-count");
+  searchCount.textContent = `${filteredEpisodes.length} episode(s) found`;
 
-    // Episode title
-    const title = document.createElement("h3");
-    title.textContent = episode.name;
-    container.appendChild(title);
+  root.innerHTML = filteredEpisodes.map(createEpisodeCard).join("");
+}
+function populateEpisodeSelect() {
+  const episodeSelect = document.getElementById("episode-select");
 
-    // Episode code: S02E07
-    const episodeCode = document.createElement("p");
+  state.allEpisodes.forEach((episode) => {
+    const option = document.createElement("option");
 
-    const season = String(episode.season).padStart(2, "0");
-    const number = String(episode.number).padStart(2, "0");
+    const seasonNumber = String(episode.season).padStart(2, "0");
+    const episodeNumber = String(episode.number).padStart(2, "0");
 
-    episodeCode.textContent = `S${season}E${number}`;
+    option.value = episode.id;
+    option.textContent = `S${seasonNumber}E${episodeNumber} - ${episode.name}`;
 
-    container.appendChild(episodeCode);
-
-    // 3. Show medium-size image
-    const image = document.createElement("img");
-
-    if (episode.image && episode.image.medium) {
-      image.src = episode.image.medium;
-      image.alt = episode.name;
-    }
-
-    container.appendChild(image);
-
-    // Episode summary
-    const summary = document.createElement("p");
-    summary.innerHTML = episode.summary || "No summary available.";
-
-    container.appendChild(summary);
-
-    // Add episode to page
-    rootElem.appendChild(container);
+    episodeSelect.appendChild(option);
   });
-
-  // 4. Link to TVMaze
-  const source = document.createElement("p");
-
-  const link = document.createElement("a");
-  link.href = "https://www.tvmaze.com/";
-  link.textContent = "Data provided by TVMaze";
-  link.target = "_blank";
-
-  source.appendChild(link);
-  rootElem.appendChild(source);
 }
+populateEpisodeSelect();
+render();
+const searchInput = document.getElementById("site-search");
 
-window.onload = setup;
+searchInput.addEventListener("input", (event) => {
+  state.searchTerm = event.target.value;
+  render();
+});
