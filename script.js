@@ -3,93 +3,64 @@
 const API_URL = "https://api.tvmaze.com/shows/82/episodes";
 
 function setup() {
-  const rootElem = document.getElementById("root");
+  const allEpisodes = getAllEpisodes();
 
-  // Show loading message while waiting for data
-  rootElem.innerHTML = "<h2>Loading episodes, please wait...</h2>";
+  makePageForEpisodes(allEpisodes);
+  setupSearch(allEpisodes); //update setup()
+}
 
-  // Fetch the episodes ONCE
-  fetch(API_URL)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error("Failed to load episodes");
-      }
+function setupSearch(allEpisodes) {
+  const searchInput = document.getElementById("search");
 
-      return response.json();
-    })
-    .then(function (allEpisodes) {
-      makePageForEpisodes(allEpisodes);
-    })
-    .catch(function (error) {
-      // Show error message to the user
-      rootElem.innerHTML =
-        "<h2>Sorry, we could not load the episodes.</h2>" +
-        "<p>Please try again later.</p>";
+  searchInput.addEventListener("input", function () {
+    const searchTerm = searchInput.value.trim().toLowerCase();
 
-      console.error(error);
+    const filteredEpisodes = allEpisodes.filter((episode) => {
+      return (
+        episode.name.toLowerCase().includes(searchTerm) ||
+        episode.summary.toLowerCase().includes(searchTerm)
+      );
     });
+
+    makePageForEpisodes(filteredEpisodes);
+  });
+}
+
+function makeEpisodeCode(season, episodeNumber) {
+  season = String(season).padStart(2, "0");
+  episodeNumber = String(episodeNumber).padStart(2, "0");
+  const episodeCode = "S" + season + "E" + episodeNumber;
+  return episodeCode;
 }
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
+  rootElem.textContent = `Got ${episodeList.length} episode(s)`;
 
-  // Clear previous content
-  rootElem.innerHTML = "";
+  // Goal: a function to create the page for the all episodes
+  // get the data from the array episode
+  // show number of episodes
+  // loop through each episode and display information
 
-  // 1. Show total number of episodes
-  const header = document.createElement("h2");
-  header.textContent = `Got ${episodeList.length} episode(s)`;
-  rootElem.appendChild(header);
+  for (const episode of episodeList) {
+    const episodeCards = document
+      .getElementById("episode_cards_template")
+      .content.cloneNode(true);
+    const code = makeEpisodeCode(episode.season, episode.number);
+    episodeCards.querySelector("#name").textContent = episode.name;
 
-  // 2. Loop through each episode
-  episodeList.forEach(function (episode) {
-    const container = document.createElement("div");
+    // Make a use of the makeEpisodeCode for the episode number content
+    episodeCards.querySelector("#EpisodeNumber").textContent = code;
 
-    // Episode title
-    const title = document.createElement("h3");
-    title.textContent = episode.name;
-    container.appendChild(title);
+    // get access to the image to assign the alt and src attributes
+    const image = episodeCards.querySelector("#image");
+    image.src = episode.image.medium;
+    image.alt = `Scene from ${code},${episode.name}`;
 
-    // Episode code: S02E07
-    const episodeCode = document.createElement("p");
-
-    const season = String(episode.season).padStart(2, "0");
-    const number = String(episode.number).padStart(2, "0");
-
-    episodeCode.textContent = `S${season}E${number}`;
-
-    container.appendChild(episodeCode);
-
-    // 3. Show medium-size image
-    const image = document.createElement("img");
-
-    if (episode.image && episode.image.medium) {
-      image.src = episode.image.medium;
-      image.alt = episode.name;
-    }
-
-    container.appendChild(image);
-
-    // Episode summary
-    const summary = document.createElement("p");
-    summary.innerHTML = episode.summary || "No summary available.";
-
-    container.appendChild(summary);
-
-    // Add episode to page
-    rootElem.appendChild(container);
-  });
-
-  // 4. Link to TVMaze
-  const source = document.createElement("p");
-
-  const link = document.createElement("a");
-  link.href = "https://www.tvmaze.com/";
-  link.textContent = "Data provided by TVMaze";
-  link.target = "_blank";
-
-  source.appendChild(link);
-  rootElem.appendChild(source);
+    // get the summary of the episode
+    episodeCards.querySelector("#summary").textContent = episode.summary;
+    document.getElementById("root").append(episodeCards);
+  }
 }
 
 window.onload = setup;
