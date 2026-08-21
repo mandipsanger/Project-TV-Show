@@ -1,4 +1,3 @@
-// You can edit ALL of the code here
 
 const API_URL = "https://api.tvmaze.com/shows/82/episodes";
 
@@ -62,5 +61,11 @@ function makePageForEpisodes(episodeList) {
     document.getElementById("root").append(episodeCards);
   }
 }
+populateEpisodeSelect();
+render();
+const searchInput = document.getElementById("site-search");
 
-window.onload = setup;
+searchInput.addEventListener("input", (event) => {
+  state.searchTerm = event.target.value;
+  render();
+});
