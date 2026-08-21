@@ -1,4 +1,7 @@
-//You can edit ALL of the code here
+// You can edit ALL of the code here
+
+const API_URL = "https://api.tvmaze.com/shows/82/episodes";
+
 function setup() {
   const allEpisodes = getAllEpisodes();
 
