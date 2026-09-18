@@ -15,8 +15,8 @@ const countContainer = document.getElementById("count-container");
 const episodeTemplate = document.getElementById("episode-card");
 
 // Load shows when the page starts
-function setup() {
-  loadShows();
+async function setup() {
+  await loadShows();
 
   showSelect.addEventListener("change", function () {
     selectedShowId = showSelect.value;
@@ -43,41 +43,38 @@ function setup() {
 }
 
 // Fetch all shows
-function loadShows() {
+async function loadShows() {
   showSelect.innerHTML = "<option>Loading shows...</option>";
 
-  fetch(SHOWS_URL)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error("Failed to load shows");
-      }
+  try {
+    const response = await fetch(SHOWS_URL);
 
-      return response.json();
-    })
-    .then(function (data) {
-      shows = data;
+    if (!response.ok) {
+      throw new Error(`Failed to load shows: ${response.status}`);
+    }
 
-      // Sort alphabetically, ignoring upper/lower case
-      shows.sort(function (a, b) {
-        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-      });
+    const data = await response.json();
+    shows = data;
 
-      populateShowSelect();
-
-      // Select the first show
-      if (shows.length > 0) {
-        showSelect.value = shows[0].id;
-        selectedShowId = shows[0].id;
-
-        loadEpisodes(selectedShowId);
-      }
-    })
-    .catch(function () {
-      showSelect.innerHTML = "<option>Could not load shows</option>";
-
-      countContainer.textContent =
-        "Sorry, there was an error loading the shows.";
+    // Sort alphabetically, ignoring upper/lower case
+    shows.sort(function (a, b) {
+      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
     });
+
+    populateShowSelect();
+
+    // Select the first show
+    if (shows.length > 0) {
+      showSelect.value = shows[0].id;
+      selectedShowId = shows[0].id;
+
+      await loadEpisodes(selectedShowId);
+    }
+  } catch (error) {
+    console.error(error);
+    showSelect.innerHTML = "<option>Could not load shows</option>";
+    countContainer.textContent = "Sorry, there was an error loading the shows.";
+  }
 }
 
 // Put shows into the dropdown
@@ -95,7 +92,7 @@ function populateShowSelect() {
 }
 
 // Fetch episodes for selected show
-function loadEpisodes(showId) {
+async function loadEpisodes(showId) {
   cardContainer.textContent = "Loading episodes...";
 
   // Don't fetch the same show twice
@@ -110,27 +107,25 @@ function loadEpisodes(showId) {
 
   const url = `https://api.tvmaze.com/shows/${showId}/episodes`;
 
-  fetch(url)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error("Failed to load episodes");
-      }
+  try {
+    const response = await fetch(url);
 
-      return response.json();
-    })
-    .then(function (data) {
-      episodes = data;
+    if (!response.ok) {
+      throw new Error(`Failed to load episodes: ${response.status}`);
+    }
 
-      // Save episodes so we don't fetch this URL again
-      episodeCache[showId] = data;
+    const data = await response.json();
+    episodes = data;
 
-      populateEpisodeSelect();
-      renderEpisodes();
-    })
-    .catch(function () {
-      cardContainer.textContent =
-        "Sorry, there was an error loading the episodes.";
-    });
+    // Save episodes so we don't fetch this URL again
+    episodeCache[showId] = data;
+
+    populateEpisodeSelect();
+    renderEpisodes();
+  } catch (error) {
+    console.error(error);
+    cardContainer.textContent = "Sorry, there was an error loading the episodes.";
+  }
 }
 
 // Put episodes into the episode dropdown
@@ -204,4 +199,4 @@ function makeEpisodeCode(season, episodeNumber) {
   return `S${seasonCode}E${episodeCode}`;
 }
 
-setup();
+window.onload = setup;
